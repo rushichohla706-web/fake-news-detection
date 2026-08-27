@@ -240,7 +240,7 @@ def classify_text(text: str):
 
     if verdict == "Credible":
         explanation = "The content contains patterns consistent with a sourced, fact-based report, but the model should still be treated as advisory."
-        recommendation = "Treat as credible but verify with official records or primary reporting before acting on it."
+        recommendation = "Treat as credible but verify with official records or primary reporting before acting on it..."
     elif verdict == "False":
         explanation = "The language patterns and weak evidence signals are consistent with a false or highly misleading claim."
         recommendation = "Exercise caution and confirm the claim with multiple independent, trustworthy sources."
