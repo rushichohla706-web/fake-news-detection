@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veritas Desk — AI Fake News Detector</title>
+  <meta name="description" content="Veritas Desk uses AI to analyze headlines and articles, detecting fake news with confidence scoring." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="masthead">
+    <div class="masthead__inner">
+      <div class="masthead__brand">
+        <span class="eyebrow">AI-ASSISTED VERIFICATION · EST. 2026</span>
+        <h1 class="masthead__title">Veritas Desk</h1>
+      </div>
+      <div class="masthead__right">
+        <span id="clock" class="mono small"></span>
+        <span class="model-tag">Model: <strong>{{ model_name or "—" }}</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Row 1: Input + Result -->
+    <div class="row-two-col">
+
+      <!-- Input card -->
+      <section class="card" id="input-card">
+        <div class="card__label">01 — SUBMIT DISPATCH</div>
+        <h2 class="card__title">Paste an article to verify</h2>
+        <p class="card__hint">Paste a headline, paragraph, or full article. The model reads language patterns and returns a verdict.</p>
+
+        <textarea
+          id="article-input"
+          class="textarea"
+          placeholder="e.g. Officials confirmed on Tuesday that the new policy will undergo review after a report was submitted to the committee..."
+          maxlength="4000"
+        ></textarea>
+
+        <div class="input-footer">
+          <span class="char-count mono"><span id="char-count">0</span> / 4000</span>
+          <button id="submit-btn" class="btn-primary">
+            <span id="btn-label">Run Verification</span>
+          </button>
+        </div>
+
+        <p id="error-msg" class="error-msg" hidden></p>
+      </section>
+
+      <!-- Result card -->
+      <section class="card" id="result-card">
+        <div class="card__label">02 — VERDICT</div>
+        <h2 class="card__title">Result</h2>
+
+        <!-- Placeholder -->
+        <div id="verdict-placeholder" class="verdict-placeholder">
+          <div class="verdict-placeholder__icon">⬡</div>
+          <p>Awaiting a dispatch.<br>Your verdict will appear here.</p>
+        </div>
+
+        <!-- Stamp (shown after analysis) -->
+        <div id="verdict-stamp" class="verdict-stamp" hidden>
+          <div class="stamp-badge" id="stamp-badge"></div>
+          <p class="stamp-sub" id="stamp-sub"></p>
+        </div>
+
+        <!-- Confidence bar -->
+        <div id="confidence-row" class="confidence-row" hidden>
+          <span class="mono small muted">CONFIDENCE</span>
+          <div class="confidence-bar">
+            <div class="confidence-bar__fill" id="conf-fill"></div>
+          </div>
+          <span class="mono small" id="conf-value">0%</span>
+        </div>
+
+        <!-- Detail cards (shown after analysis) -->
+        <div id="detail-grid" class="detail-grid" hidden>
+          <div class="detail-card wide">
+            <span class="detail-card__label">REASON</span>
+            <p id="detail-reason">—</p>
+          </div>
+          <div class="detail-card">
+            <span class="detail-card__label">SOURCE CREDIBILITY</span>
+            <p id="detail-credibility">—</p>
+          </div>
+          <div class="detail-card">
+            <span class="detail-card__label">LANGUAGE</span>
+            <p id="detail-language">—</p>
+          </div>
+          <div class="detail-card">
+            <span class="detail-card__label">DETECTED DATE</span>
+            <p id="detail-date">—</p>
+          </div>
+          <div class="detail-card wide">
+            <span class="detail-card__label">RECOMMENDATION</span>
+            <p id="detail-recommendation">—</p>
+          </div>
+          <div class="detail-card wide">
+            <span class="detail-card__label">AI CONTENT WARNING</span>
+            <p id="detail-ai-warn">—</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Row 2: Stats strip -->
+    <section class="card stats-strip" id="stats-strip">
+      <div class="stat">
+        <span class="stat__val mono" id="stat-total">0</span>
+        <span class="stat__label">Checked</span>
+      </div>
+      <div class="stat">
+        <span class="stat__val mono credible" id="stat-credible">0</span>
+        <span class="stat__label">Credible</span>
+      </div>
+      <div class="stat">
+        <span class="stat__val mono misleading" id="stat-misleading">0</span>
+        <span class="stat__label">Misleading</span>
+      </div>
+      <div class="stat">
+        <span class="stat__val mono false-col" id="stat-false">0</span>
+        <span class="stat__label">False</span>
+      </div>
+      <div class="stat">
+        <span class="stat__val mono muted" id="stat-unverified">0</span>
+        <span class="stat__label">Unverified</span>
+      </div>
+      <div class="stat">
+        <span class="stat__val mono gold" id="stat-acc">—</span>
+        <span class="stat__label">Model Accuracy</span>
+      </div>
+    </section>
+
+    <!-- Row 3: History ledger -->
+    <section class="card" id="ledger-card">
+      <div class="card__label">03 — LOG</div>
+      <h2 class="card__title">Recent checks</h2>
+      <div class="table-wrap">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Excerpt</th>
+              <th>Verdict</th>
+              <th>Confidence</th>
+              <th>Time</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ledger-body">
+            <tr class="ledger-empty"><td colspan="5">No checks logged yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <p>Veritas Desk · TF-IDF + {{ model_name or "classifier" }} pipeline trained on labeled news text. Predictions are language-pattern estimates — always corroborate with primary sources.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

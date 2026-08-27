@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veritas Desk — AI Fake News Detector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead__inner">
+    <div class="masthead__brand">
+      <span class="masthead__eyebrow">AI-ASSISTED VERIFICATION &middot; EST. 2026</span>
+      <h1 class="masthead__title">Veritas&nbsp;Desk</h1>
+    </div>
+    <div class="masthead__meta">
+      <span id="clock" class="mono"></span>
+      <span class="masthead__model">Model on duty: <strong>{{ model_name or "—" }}</strong></span>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+
+  <section class="dispatch">
+    <div class="dispatch__head">
+      <span class="tag">01 — SUBMIT DISPATCH</span>
+      <h2>Paste an article to verify</h2>
+      <p class="dispatch__hint">Drop in a headline, paragraph, or full article. The model reads the language patterns and returns a verdict with a confidence score.</p>
+    </div>
+
+    <textarea id="article-input" class="dispatch__textarea" placeholder="e.g. Officials confirmed on Tuesday that the new policy will undergo review after a report was submitted to the committee..." maxlength="4000"></textarea>
+
+    <div class="dispatch__footer">
+      <span class="char-count mono"><span id="char-count">0</span> / 4000</span>
+      <button id="submit-btn" class="btn-stamp">Run Verification</button>
+    </div>
+    <p id="error-msg" class="error-msg" hidden></p>
+  </section>
+
+  <section class="verdict" id="verdict-section">
+    <div class="verdict__head">
+      <span class="tag">02 — VERDICT</span>
+      <h2>Result</h2>
+    </div>
+
+    <div class="verdict__stage" id="verdict-stage">
+      <p class="verdict__placeholder">Awaiting a dispatch. Your verdict will be stamped here.</p>
+    </div>
+
+    <div class="confidence-row" id="confidence-row" hidden>
+      <span class="mono confidence-row__label">CONFIDENCE</span>
+      <div class="confidence-bar">
+        <div class="confidence-bar__fill" id="confidence-fill"></div>
+      </div>
+      <span class="mono confidence-row__value" id="confidence-value">0%</span>
+    </div>
+  </section>
+
+  <section class="stats-strip" id="stats-strip">
+    <div class="stat">
+      <span class="stat__value mono" id="stat-total">0</span>
+      <span class="stat__label">Checked</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value mono" id="stat-real">0</span>
+      <span class="stat__label">Verified</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value mono" id="stat-fake">0</span>
+      <span class="stat__label">Flagged</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value mono" id="stat-conf">0%</span>
+      <span class="stat__label">Avg. Confidence</span>
+    </div>
+    <div class="stat">
+      <span class="stat__value mono" id="stat-acc">—</span>
+      <span class="stat__label">Model Accuracy</span>
+    </div>
+  </section>
+
+  <section class="ledger">
+    <div class="ledger__head">
+      <span class="tag">03 — LOG</span>
+      <h2>Recent checks</h2>
+    </div>
+    <table class="ledger__table">
+      <thead>
+        <tr>
+          <th>Excerpt</th>
+          <th>Verdict</th>
+          <th>Confidence</th>
+          <th>Time</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="ledger-body">
+        <tr class="ledger__empty"><td colspan="5">No checks logged yet.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Veritas Desk runs a TF-IDF + {{ model_name or "classifier" }} pipeline trained on labeled news text. Predictions are a language-pattern estimate, not a fact-check — always corroborate with primary sources.</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
